@@ -33,7 +33,7 @@ const loadKnowledgeBase = async () => {
         } else {
             // CÁCH 2: Nếu file vẫn để online (GitHub)
             console.log("--> Không thấy file local, đang tải từ GitHub...");
-            const response = await axios.get("https://gist.githubusercontent.com/kieunhi050595-star/ddecde18f83b77d06a117a9fcf349188/raw/dulieu.txt");
+            const response = await axios.get("https://gist.githubusercontent.com/xn43190-cmd/c4349f2ad8abb1cd7d0809310d5f0e55/raw/b846d9b77d3bce8e8a523096b47d00736ee680bc/dulieu.txt");
             knowledgeBase = response.data;
             console.log("--> Đã tải dulieu.txt từ Online thành công!");
         }
