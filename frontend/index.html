@@ -35,7 +35,7 @@
         .message-bubble p {
             font-size: 18px;
             line-height: 1.6;
-            word-break: break-word; /* Để link dài không làm vỡ layout */
+            word-break: break-word; 
         }
         .message-bubble a {
             color: #2563eb !important;
@@ -74,9 +74,9 @@
         window.addEventListener('resize', setAppHeight);
         setAppHeight();
 
-        // === 2. CẤU HÌNH API ===
-        const BACKEND_API_URL = "https://phungsuvien.onrender.com";
-        // ======================
+        // === 2. CẤU HÌNH API (Chỉ giữ lại cái này) ===
+        const BACKEND_API_URL = "https://trolyniemkinh.onrender.com";
+        // ============================================
 
         // --- 3. KHỞI TẠO DOM ---
         const chatMessages = document.getElementById('chat-messages');
@@ -93,13 +93,12 @@
             }
         });
 
-        // --- 5. KHỞI TẠO TRANG (Logic Mới) ---
+        // --- 5. KHỞI TẠO TRANG (QUAN TRỌNG: Đã xóa lệnh fetch gây lỗi) ---
         window.addEventListener('load', () => {
-            // Không tải dulieu.txt nữa. Mở chat ngay.
+            // Không còn try/catch fetch(DEFAULT_DOCUMENT_URL) ở đây nữa
             addMessage('Đệ chào Sư huynh ! Sư huynh cứ đặt câu hỏi ạ?', 'bot');
             userInput.disabled = false;
             userInput.placeholder = "Nhập câu hỏi của bạn...";
-            // Nút gửi vẫn disable cho đến khi user nhập chữ
         });
 
         // --- 6. HÀM XỬ LÝ VĂN BẢN (Linkify) ---
@@ -144,9 +143,8 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // --- 8. GỌI API BACKEND (Logic Mới - Chỉ gửi question) ---
+        // --- 8. GỌI API BACKEND (Chỉ gửi question) ---
         async function callBackendAPI(question) {
-            // Xử lý URL (bỏ dấu gạch chéo cuối nếu có)
             const url = `${BACKEND_API_URL.replace(/\/$/, "")}/api/chat`;
 
             const response = await fetch(url, {
@@ -154,7 +152,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: question 
-                    // LƯU Ý: Không gửi 'context' nữa
                 })
             });
 
@@ -176,25 +173,20 @@
             const userQuestion = userInput.value.trim();
             if (!userQuestion) return;
             
-            // 1. Hiển thị câu hỏi user
             addMessage(userQuestion, 'user');
             userInput.value = '';
             
-            // 2. Khóa nút và hiện loading
             sendButton.disabled = true;
             sendButton.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>';
 
             try {
-                // 3. Gọi API
                 const answer = await callBackendAPI(userQuestion);
                 addMessage(answer, 'bot');
             } catch (error) {
                 console.error("Lỗi:", error);
                 addMessage(`Có lỗi xảy ra: ${error.message}. Hãy thử lại sau.`, 'bot', 'error');
             } finally {
-                // 4. Mở lại nút (nhưng vẫn disable nếu ô input rỗng)
                 sendButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22l-4-9-9-4 22-2z"></path></svg>';
-                // Kiểm tra lại input để quyết định disable hay không
                 sendButton.disabled = userInput.value.trim().length === 0;
             }
         }
@@ -210,7 +202,6 @@
         });
 
         userInput.addEventListener('input', () => { 
-            // Chỉ mở nút gửi khi có chữ
             sendButton.disabled = userInput.value.trim().length === 0; 
         });
 
