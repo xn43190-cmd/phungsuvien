@@ -37,38 +37,29 @@
             line-height: 1.6;
             word-break: break-word; /* Để link dài không làm vỡ layout */
         }
-        /* START: CSS ĐỂ GIẢI QUYẾT DỨT ĐIỂM VẤN ĐỀ POPUP */
-        /* Quy tắc này có độ ưu tiên rất cao, đảm bảo mọi link bên trong
-           bong bóng chat sẽ luôn có màu xanh và gạch chân. */
         .message-bubble a {
             color: #2563eb !important;
             text-decoration: underline !important;
             font-weight: 600 !important;
         }
-        /* END: CSS ĐỂ GIẢI QUYẾT DỨT ĐIỂM VẤN ĐỀ POPUP */
     </style>
 </head>
 <body class="bg-stone-100 text-stone-800">
 
-    <!-- Container chính -->
     <div class="w-screen flex flex-col bg-white" style="height: var(--app-height, 100vh);">
         
-        <!-- Header -->
         <div class="text-center py-4 border-b border-stone-200 shadow-sm flex-shrink-0">
             <h1 class="font-title text-2xl md:text-3xl font-bold text-amber-800">Phụng Sự Viên Ảo</h1>
             <p class="text-stone-500 text-sm mt-1">Pháp Môn Tâm Linh 心靈法門</p>
         </div>
 
-        <!-- Khu vực tin nhắn -->
         <div id="chat-messages" class="flex-1 p-4 md:p-6 overflow-y-auto bg-stone-50">
-            <!-- Tin nhắn sẽ được thêm bằng JavaScript -->
-        </div>
+            </div>
 
-        <!-- Form nhập liệu -->
         <div class="p-4 bg-white border-t border-stone-200 shadow-inner flex-shrink-0">
             <div class="flex items-center bg-stone-100 rounded-full p-2">
-                <input type="text" id="user-input" placeholder="Đang chuẩn bị..." class="flex-1 bg-transparent px-4 py-2 text-stone-700 text-lg focus:outline-none" autocomplete="off" disabled>
-                <button id="send-button" class="bg-amber-700 hover:bg-amber-800 text-white w-12 h-12 rounded-full transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:bg-stone-400 flex-shrink-0">
+                <input type="text" id="user-input" placeholder="Đang kết nối..." class="flex-1 bg-transparent px-4 py-2 text-stone-700 text-lg focus:outline-none" autocomplete="off" disabled>
+                <button id="send-button" class="bg-amber-700 hover:bg-amber-800 text-white w-12 h-12 rounded-full transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:bg-stone-400 flex-shrink-0" disabled>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22l-4-9-9-4 22-2z"></path></svg>
                 </button>
             </div>
@@ -76,46 +67,42 @@
     </div>
 
     <script>
-        // --- SỬA LỖI CHIỀU CAO TRÊN MOBILE ---
+        // --- 1. SỬA LỖI CHIỀU CAO TRÊN MOBILE ---
         const setAppHeight = () => {
             document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
         }
         window.addEventListener('resize', setAppHeight);
         setAppHeight();
-        // --- KẾT THÚC SỬA LỖI ---
 
-        // === THÔNG TIN CẤU HÌNH ===
-        // Lưu ý: Đảm bảo URL này đúng với Server Render của bạn
-        const BACKEND_API_URL = "https://trolyniemkinh.onrender.com"; 
-        // ==========================
+        // === 2. CẤU HÌNH API ===
+        const BACKEND_API_URL = "https://trolyniemkinh.onrender.com";
+        // ======================
 
+        // --- 3. KHỞI TẠO DOM ---
         const chatMessages = document.getElementById('chat-messages');
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
 
-        // --- Bắt sự kiện click để mở link trong tab mới ---
+        // --- 4. XỬ LÝ SỰ KIỆN CLICK LINK ---
         chatMessages.addEventListener('click', function(event) {
             const linkElement = event.target.closest('a');
             if (linkElement) {
                 event.preventDefault();
                 const url = linkElement.href;
-                if (url) {
-                    window.open(url, '_blank', 'noopener,noreferrer');
-                }
+                if (url) window.open(url, '_blank', 'noopener,noreferrer');
             }
         });
 
-        // --- KHỞI TẠO TRANG (Đã bỏ phần tải dữ liệu dulieu.txt) ---
+        // --- 5. KHỞI TẠO TRANG (Logic Mới) ---
         window.addEventListener('load', () => {
-            // Server đã lo phần dữ liệu, Client chỉ cần sẵn sàng
+            // Không tải dulieu.txt nữa. Mở chat ngay.
             addMessage('Đệ chào Sư huynh ! Sư huynh cứ đặt câu hỏi ạ?', 'bot');
             userInput.disabled = false;
             userInput.placeholder = "Nhập câu hỏi của bạn...";
+            // Nút gửi vẫn disable cho đến khi user nhập chữ
         });
 
-        /**
-         * Hàm xử lý link và văn bản.
-         */
+        // --- 6. HÀM XỬ LÝ VĂN BẢN (Linkify) ---
         function linkifyAndSanitize(text) {
             if (typeof text !== 'string') return '';
             const urlRegex = /(https?:\/\/[^\s<>"']+)/g;
@@ -126,6 +113,7 @@
             return linkifiedText.replace(/\n/g, '<br>');
         }
 
+        // --- 7. HÀM HIỂN THỊ TIN NHẮN ---
         function addMessage(message, sender, type = 'normal') {
             const messageWrapper = document.createElement('div');
             messageWrapper.classList.add('message', 'mb-4', 'flex', 'w-full');
@@ -156,8 +144,9 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // --- GỌI API (Đã bỏ tham số context) ---
+        // --- 8. GỌI API BACKEND (Logic Mới - Chỉ gửi question) ---
         async function callBackendAPI(question) {
+            // Xử lý URL (bỏ dấu gạch chéo cuối nếu có)
             const url = `${BACKEND_API_URL.replace(/\/$/, "")}/api/chat`;
 
             const response = await fetch(url, {
@@ -165,18 +154,16 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     question: question 
-                    // Không gửi context nữa vì server đã có sẵn
+                    // LƯU Ý: Không gửi 'context' nữa
                 })
             });
 
             if (!response.ok) {
-                let errorText = `Lỗi HTTP: ${response.status} ${response.statusText}`;
+                let errorText = `Lỗi kết nối: ${response.status}`;
                 try {
                     const errorData = await response.json();
-                    errorText = `Đệ xin lỗi: ${errorData.error || response.statusText}`;
-                } catch (e) {
-                    errorText = `Server trả về lỗi không phải JSON (status: ${response.status}).`;
-                }
+                    errorText = errorData.error || errorText;
+                } catch (e) {}
                 throw new Error(errorText);
             }
 
@@ -184,28 +171,35 @@
             return result.answer;
         }
 
+        // --- 9. XỬ LÝ KHI GỬI TIN ---
         async function handleSendMessage() {
             const userQuestion = userInput.value.trim();
             if (!userQuestion) return;
             
+            // 1. Hiển thị câu hỏi user
             addMessage(userQuestion, 'user');
             userInput.value = '';
+            
+            // 2. Khóa nút và hiện loading
             sendButton.disabled = true;
             sendButton.innerHTML = '<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>';
 
             try {
-                // Gọi hàm mới không cần truyền context
+                // 3. Gọi API
                 const answer = await callBackendAPI(userQuestion);
                 addMessage(answer, 'bot');
             } catch (error) {
-                console.error("Lỗi chi tiết:", error);
-                addMessage(error.message, 'bot', 'error');
+                console.error("Lỗi:", error);
+                addMessage(`Có lỗi xảy ra: ${error.message}. Hãy thử lại sau.`, 'bot', 'error');
             } finally {
-                sendButton.disabled = false;
+                // 4. Mở lại nút (nhưng vẫn disable nếu ô input rỗng)
                 sendButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"></path><path d="M22 2L15 22l-4-9-9-4 22-2z"></path></svg>';
+                // Kiểm tra lại input để quyết định disable hay không
+                sendButton.disabled = userInput.value.trim().length === 0;
             }
         }
 
+        // --- 10. LẮNG NGHE SỰ KIỆN ---
         sendButton.addEventListener('click', handleSendMessage);
         
         userInput.addEventListener('keydown', (event) => { 
@@ -215,10 +209,11 @@
             }
         });
 
-        // Bỏ điều kiện kiểm tra documentContext
         userInput.addEventListener('input', () => { 
+            // Chỉ mở nút gửi khi có chữ
             sendButton.disabled = userInput.value.trim().length === 0; 
         });
+
     </script>
 </body>
 </html>
